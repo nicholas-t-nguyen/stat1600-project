@@ -1,3 +1,9 @@
+library(tidyverse)
+library(httr)
+library(jsonlite)
+library(ggplot2)
+
+
 cder <- GET("https://data.colorado.gov/resource/44v8-6fzj.json?grade_level=9&subject=READING")
 cdew <- GET("https://data.colorado.gov/resource/44v8-6fzj.json?grade_level=9&subject=WRITING")
 cdem <- GET("https://data.colorado.gov/resource/44v8-6fzj.json?grade_level=9&subject=MATH")
@@ -58,11 +64,23 @@ reading_rates2009 <- my_schools %>%
   mutate(passing2009 = (proficient + advanced) / (unsatisfactory + partial + proficient + advanced)) %>%
   select(school_no, passing2009)
 
+reading_mean2009 <- reading_rates2009 %>%
+  summarize(mean=mean(passing2009)) %>% 
+  mutate(mean=mean*100) %>%
+  mutate(year=2009) %>%
+  mutate(subject="READING")
+
 reading_rates2010 <- my_schools %>%
   filter(subject=="READING") %>%
   filter(year==2010) %>%
   mutate(passing2010 = (proficient + advanced) / (unsatisfactory + partial + proficient + advanced)) %>%
   select(school_no, passing2010)
+
+reading_mean2010 <- reading_rates2010 %>%
+  summarize(mean=mean(passing2010)) %>% 
+  mutate(mean=mean*100) %>%
+  mutate(year=2010) %>%
+  mutate(subject="READING")
 
 reading_rates <- merge(reading_rates2009, reading_rates2010) %>%
   mutate(diff = passing2010 - passing2009)
@@ -80,14 +98,14 @@ reading_boot <- replicate(
 )
 reading_boot_df <- data.frame(values = reading_boot)
 
-ggplot(reading_boot_df, aes(values)) +
-  geom_histogram(color="black",fill="gold",bins=32) +
+rp <- ggplot(reading_boot_df, aes(values)) +
+  geom_histogram(color="black",fill="#CFB87C",bins=32) +
   geom_vline(xintercept=quantile(reading_boot_df$values,0.05),
              color="black",linetype="dashed",linewidth=1) +
   geom_vline(xintercept=quantile(reading_boot_df$values,0.95),
              color="black",linetype="dashed",linewidth=1) +
   labs(title="Reading Score Change Between 2009 and 2010",
-       subtitle="Boostrap Sampling Distribution",
+       subtitle="Boostrap Sampling Distribution with 95% Confidence Intervals",
        x="Change",
        y="Count") +
   theme_bw()
@@ -100,11 +118,23 @@ writing_rates2009 <- my_schools %>%
   mutate(passing2009 = (proficient + advanced) / (unsatisfactory + partial + proficient + advanced)) %>%
   select(school_no, passing2009)
 
+writing_mean2009 <- writing_rates2009 %>%
+  summarize(mean=mean(passing2009)) %>% 
+  mutate(mean=mean*100) %>%
+  mutate(year=2009) %>%
+  mutate(subject="WRITING")
+
 writing_rates2010 <- my_schools %>%
   filter(subject=="WRITING") %>%
   filter(year==2010) %>%
   mutate(passing2010 = (proficient + advanced) / (unsatisfactory + partial + proficient + advanced)) %>%
   select(school_no, passing2010)
+
+writing_mean2010 <- writing_rates2010 %>%
+  summarize(mean=mean(passing2010)) %>% 
+  mutate(mean=mean*100) %>%
+  mutate(year=2010) %>%
+  mutate(subject="WRITING")
 
 writing_rates <- merge(writing_rates2009, writing_rates2010) %>%
   mutate(diff = passing2010 - passing2009)
@@ -122,14 +152,14 @@ writing_boot <- replicate(
 )
 writing_boot_df <- data.frame(values = writing_boot)
 
-ggplot(writing_boot_df, aes(values)) +
-  geom_histogram(color="black",fill="gold",bins=32) +
+wp <- ggplot(writing_boot_df, aes(values)) +
+  geom_histogram(color="black",fill="#CFB87C",bins=32) +
   geom_vline(xintercept=quantile(writing_boot_df$values,0.025),
              color="black",linetype="dashed",linewidth=1) +
   geom_vline(xintercept=quantile(writing_boot_df$values,0.975),
              color="black",linetype="dashed",linewidth=1) +
   labs(title="Writing Score Change Between 2009 and 2010",
-       subtitle="Bootstrap Sampling Distribution",
+       subtitle="Bootstrap Sampling Distribution with 95% Confidence Intervals",
        x="Change",
        y="Count") +
   theme_bw() +
@@ -143,11 +173,23 @@ math_rates2009 <- my_schools %>%
   mutate(passing2009 = (proficient + advanced) / (unsatisfactory + partial + proficient + advanced)) %>%
   select(school_no, passing2009)
 
+math_mean2009 <- math_rates2009 %>%
+  summarize(mean=mean(passing2009)) %>% 
+  mutate(mean=mean*100) %>%
+  mutate(year=2009) %>%
+  mutate(subject="MATH")
+
 math_rates2010 <- my_schools %>%
   filter(subject=="MATH") %>%
   filter(year==2010) %>%
   mutate(passing2010 = (proficient + advanced) / (unsatisfactory + partial + proficient + advanced)) %>%
   select(school_no, passing2010)
+
+math_mean2010 <- math_rates2010 %>%
+  summarize(mean=mean(passing2010)) %>% 
+  mutate(mean=mean*100) %>%
+  mutate(year=2010) %>%
+  mutate(subject="MATH")
 
 math_rates <- merge(math_rates2009, math_rates2010) %>%
   mutate(diff = passing2010 - passing2009)
@@ -165,23 +207,66 @@ math_boot <- replicate(
 )
 math_boot_df <- data.frame(values = math_boot)
 
-ggplot(math_boot_df, aes(values)) +
-  geom_histogram(color="black",fill="gold",bins=32) +
+mp <- ggplot(math_boot_df, aes(values)) +
+  geom_histogram(color="black",fill="#CFB87C",bins=32) +
   geom_vline(xintercept=quantile(math_boot_df$values,0.025),
              color="black",linetype="dashed",linewidth=1) +
   geom_vline(xintercept=quantile(math_boot_df$values,0.975),
              color="black",linetype="dashed",linewidth=1) +
   labs(title="Math Score Change Between 2009 and 2010",
-       subtitle="Bootstrap Sampling Distribution",
+       subtitle="Bootstrap Sampling Distribution with 95% Confidence Intervals",
        x="Change",
        y="Count") +
   theme_bw() +
   scale_x_continuous(limits=c(0, NA))
 
 
+###GRAPHING DIFFERENCE IN MEANS###
+combined <- bind_rows(reading_mean2009, reading_mean2010, writing_mean2009, writing_mean2010, math_mean2009, math_mean2010)
+combined$year <- factor(combined$year)
+cp <- ggplot(combined, aes(x = year, y = mean, color = subject, group = subject)) +
+  geom_line() +
+  geom_text(aes(label = round(mean, 1)), 
+            vjust = -1, size = 3, show.legend = FALSE) +  
+  geom_point() +
+  labs(x = "Year", y = "Mean Score", title = "CSAP Subject Scores", subtitle="2009-2010") +
+  scale_color_manual(name = "Subject", values = c("READING" = "darkblue", "WRITING" = "red", "MATH" = "goldenrod1")) +
+  theme_bw() + 
+  theme(text = element_text(size = 12)) +
+  scale_y_continuous(limits=c(20,80))
 
+###DID SCHOOSL WITH INCREASED MATH GRADES PERFORM WORSE IN READING/WRITING###
+math_improved <- math_rates %>% 
+  filter(diff >= 0)
 
+math_improved_schools <- math_improved %>% 
+  select(school_no)
 
+writing_for_mis <- writing_rates %>%
+  filter(school_no %in% math_improved_schools$school_no)
+
+writing_for_mis_mean_boot <- replicate(
+  n=5000,
+  expr = {
+    writing_for_mis %>% 
+      slice_sample(prop=1, replace=TRUE) %>% 
+      summarize(mean_diff=mean(diff)) %>%
+      pull(mean_diff)
+  }
+)
+writing_for_mis_df <- data.frame(values = writing_for_mis_mean_boot)
+
+ggplot(writing_for_mis_df, aes(values)) +
+  geom_histogram(color="black",fill="#CFB87C",bins=32) +
+  geom_vline(xintercept=quantile(writing_for_mis_df$values,0.025),
+             color="black",linetype="dashed",linewidth=1) +
+  geom_vline(xintercept=quantile(writing_for_mis_df$values,0.975),
+             color="black",linetype="dashed",linewidth=1) +
+  labs(title="Math Score Change Between 2009 and 2010",
+       subtitle="Bootstrap Sampling Distribution",
+       x="Change",
+       y="Count") +
+  theme_bw() 
 
 
 

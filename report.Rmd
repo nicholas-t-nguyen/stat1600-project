@@ -25,6 +25,17 @@ header-includes:
     }
 ---
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(include = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
+```
+
+```{r}
+source("script.R", local = knitr::knit_global())
+```
+
+```{=tex}
 \begin{titlepage}
 \centering
 
@@ -50,35 +61,54 @@ May 6, 2024
 \vfill
 \vfill
 \end{titlepage}
-
+```
 # Introduction
+
 This report seeks to understand how CDE initiatives have affected testing scores across the state for the years 2009-2010, specifically on the CSAP math scores for 9th-grade students. This report seeks to answer the following questions:
 
-* Was there improvement in math scores between 2009 and 2010?
-  * If so, did improvements in math scores lead to a decline in reading and writing scores?
-* Was there any association between a school's math passing rate and its passing rates on reading and writing?
-  * How accurately can we predict a school's math passing rate from its passing rates on reading and writing?
-
+-   Was there improvement in math scores between 2009 and 2010?
+    -   If so, did improvements in math scores lead to a decline in reading and writing scores?
+-   Was there any association between a school's math passing rate and its passing rates on reading and writing?
+    -   How accurately can we predict a school's math passing rate from its passing rates on reading and writing?
 
 # Data Aquisition and Analysis
-## Aquisition and Cleaning
-Data for CSAP scores in 2009-2010 was collected from the Colorado Information Marketplace.^[https://data.colorado.gov/K-12/CSAP-School-And-District-Summary-Results-2010/44v8-6fzj/about_data] In order to ensure that the data we have acquired is suitable for use in our analyses, we must first "clean" the data. Data is cleaned in order to ensure that: 
 
-1. each row of data is a school with 31 or more students enrolled for the years 2009 and 2010,
-2. each column of data is a valid data type (categorical or numerical), and
-3. each row contains data only for one school, year (2009 or 2010), and subject (reading, writing, or math). This will make it so that there are six total observations for any given school. 
+## Aquisition and Cleaning
+
+Data for CSAP scores in 2009-2010 was collected from the Colorado Information Marketplace.[^1] In order to ensure that the data we have acquired is suitable for use in our analyses, we must first "clean" the data. Data is cleaned in order to ensure that:
+
+[^1]: <https://data.colorado.gov/K-12/CSAP-School-And-District-Summary-Results-2010/44v8-6fzj/about_data>
+
+1.  each row of data is a school with 31 or more students enrolled for the years 2009 and 2010,
+2.  each column of data is a valid data type (categorical or numerical), and
+3.  each row contains data only for one school, year (2009 or 2010), and subject (reading, writing, or math). This will make it so that there are six total observations for any given school.
 
 Cleaning the data this way allows us to later easily sort the data by school, year, or subject. It also ensures that each observation we are using is valid, i.e. it belongs to a school and is not an observation that represents district or state totals.
 
 ## Analysis
-The first analysis we will perform
+
+The first analysis we will perform will be to determine if there were any statistically significant changes to the CSAP scores between 2009 and 2010. Throughout our analysis we will we working with a sample of 120 randomly selected schools from our cleaned data. Firstly, allow us to analyze the average change in passing rates[^2].
+
+[^2]: The passing rate is calculated by taking the sum of the number of proficient and advanced scoring students and dividing it by the total number of students who have scores at any given school.
+
+```{r, include=TRUE, fig.cap= "CSAP subject scores from 2009-2010", fig.width=6, fig.height=4, out.width=240, out.heigh=160, fig.align='center'}
+cp
+```
+
+Figure 1 shows us the changes in each CSAP subject area from 2009-2010. Initially we do see that math scores increased, writing scores decreased, and reading scores remained stagnant, we must perform further analysis in order to come to a more concrete conclusion. We utilize a statistical method known as "bootstrapping" in order to help us come to said conclusion. 
+
+```{r, fig.cap="Bootstrap Sampling Distributions with 95% Confidence Intervals", include=TRUE, figures-side, fig.show="hold", out.width="49%", fig.align='center'}
+mp
+rp
+wp
+```
+
+Figure 2 represents bootstrap sampling distributions with 95% confidence intervals. These confidence intervals give us an idea where the true mean of difference in passing rates between 2009 and 2010 lives^[Note that there is much more nuance in interpreting confidence intervals than is mentioned here. Particularly, a 95% confidence interval formally only tells us that 95% of samples we collect are going to be within a certain range.]. If we find that the confidence interval contains 0, we can assume that that there is no meaningful difference in the passing rates between 2009 and 2010. However, if we find that the confidence interval does not contain 0, we can assume that there is indeed a meaningful difference in the passing rates between 2009 and 2010^[Formally, if the confidence interval does not contain 0, we would say that "we reject the idea that there is no difference in scores from 2009 to 2010". Consequently, we can't say that CDE's iniatives have affected scores, but rather that scores have indeed changed and that it should be investigated further.]. From these ideas, we can conclude that math scores have increased, writing scores have decreased, and reading scores have remained stagnant between 2009 and 2010.
 
 ## Advise
 
 ## Answer
 
-
-
-
-
-
+```{r}
+warnings()
+```
